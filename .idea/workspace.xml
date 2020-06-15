@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="49820e79-7048-4401-a3fc-07fb641d462d" name="Default Changelist" comment="" />
+    <list default="true" id="49820e79-7048-4401-a3fc-07fb641d462d" name="Default Changelist" comment="init">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -14,7 +16,16 @@
       </list>
     </option>
   </component>
+  <component name="Git.Settings">
+    <option name="PREVIOUS_COMMIT_AUTHORS">
+      <list>
+        <option value="imansamaee &lt;imansamaee@gmail.com&gt;" />
+      </list>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
   <component name="ProjectId" id="1dGGimOBjunvOb34opAlp8BRuJL" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -24,7 +35,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="TERMINAL_CUSTOM_COMMANDS_GOT_IT" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/res/font" />
-    <property name="settings.editor.selected.configurable" value="configurable.group.appearance" />
+    <property name="settings.editor.selected.configurable" value="org.jetbrains.plugins.github.ui.GithubSettingsConfigurable" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -116,7 +127,19 @@
       <option name="presentableId" value="Default" />
       <updated>1592044145173</updated>
     </task>
+    <task id="LOCAL-00001" summary="init">
+      <created>1592186434556</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1592186434556</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="init" />
+    <option name="LAST_COMMIT_MESSAGE" value="init" />
   </component>
   <component name="WindowStateProjectService">
     <state x="3304" y="382" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1592045241190">
@@ -127,6 +150,14 @@
       <screen x="2560" y="0" width="2560" height="1440" />
     </state>
     <state x="3535" y="525" key="#com.intellij.fileTypes.FileTypeChooser/2560.0.2560.1440/0.0.2560.1440@2560.0.2560.1440" timestamp="1592160316512" />
+    <state x="417" y="22" key="CommitChangelistDialog2" timestamp="1592186491739">
+      <screen x="0" y="0" width="1680" height="1050" />
+    </state>
+    <state x="417" y="22" key="CommitChangelistDialog2/0.0.1680.1050@0.0.1680.1050" timestamp="1592186491739" />
+    <state x="711" y="433" key="Github.ShareDialog" timestamp="1592187069169">
+      <screen x="0" y="0" width="1680" height="1050" />
+    </state>
+    <state x="711" y="433" key="Github.ShareDialog/0.0.1680.1050@0.0.1680.1050" timestamp="1592187069169" />
     <state width="259" height="1058" key="GridCell.Tab.0.bottom" timestamp="1592160794615">
       <screen x="2560" y="0" width="2560" height="1440" />
     </state>
@@ -159,6 +190,10 @@
     <state width="821" height="1122" key="GridCell.Tab.0.right/2560.0.2560.1440/0.23.2560.1417@2560.0.2560.1440" timestamp="1592049138208" />
     <state width="821" height="1058" key="GridCell.Tab.0.right/2560.23.2560.1417/0.23.2560.1417@0.23.2560.1417" timestamp="1592142851613" />
     <state width="821" height="1065" key="GridCell.Tab.0.right/2560.23.2560.1417/0.23.2560.1417@2560.23.2560.1417" timestamp="1592068448106" />
+    <state x="341" y="163" key="SettingsEditor" timestamp="1592186929891">
+      <screen x="0" y="0" width="1680" height="1050" />
+    </state>
+    <state x="341" y="163" key="SettingsEditor/0.0.1680.1050@0.0.1680.1050" timestamp="1592186929891" />
     <state x="976" y="381" width="670" height="676" key="search.everywhere.popup" timestamp="1592131427339">
       <screen x="0" y="23" width="2560" height="1417" />
     </state>
