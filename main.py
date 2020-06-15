@@ -57,29 +57,46 @@ class MainLayer(Widget):
             self.score_text = Label(pos=(Window.width - 230, Window.height - 100),
                                     text=fix_text(str(self.score)),
                                     font_name="res/font/Far_Fanni",
-                                    font_size="24",
+                                    font_size="12",
                                     halign='left',
                                     color=[0, 0, 1, 1])
             self.score_label = Label(pos=(Window.width - 150, Window.height - 100),
                                      text=fix_text("امتیاز : "),
                                      font_name="res/font/Far_Fanni",
-                                     font_size="24",
+                                     font_size="12",
                                      halign='left',
                                      color=[0, 0, 1, 1])
 
-            self.answer_result = Label(pos=(150, Window.height - 100),
-                                       text=fix_text(""),
-                                       font_name="res/font/Far_Fanni",
-                                       font_size="24",
-                                       halign='left',
-                                       color=[0, 0, 1, 1])
+            self.answer_result_line_1 = Label(pos=(50, Window.height - 100),
+                                              text=fix_text(""),
+                                              font_name="res/font/Far_Fanni",
+                                              font_size="12",
+                                              halign='left',
+                                              opacity=0,
+                                              color=[0, 0, 1, 1])
+
+            self.answer_result_line_2 = Label(pos=(50, Window.height - 130),
+                                              text=fix_text("ghfghfh"),
+                                              font_name="res/font/Far_Fanni",
+                                              font_size="12",
+                                              halign='left',
+                                              opacity=1,
+                                              color=[0, 0, 1, 1])
+
+            self.answer_result_line_3 = Label(pos=(50, Window.height - 160),
+                                              text=fix_text("fghfhfh"),
+                                              font_name="res/font/Far_Fanni",
+                                              font_size="12",
+                                              halign='left',
+                                              opacity=1,
+                                              color=[0, 0, 1, 1])
 
             Color(160, 92, 56, 1, mode="rgba")
             self.score_line = Line(rectangle=(0, Window.height - 100,
                                               Window.width, Window.height),
                                    )
 
-            self.main_word = Label(pos=(20, 600),
+            self.main_word = Label(pos=(150, 450),
                                    text=fix_text("سارا بیات"),
                                    font_name="res/font/Far_Fanni",
                                    font_size="24",
@@ -90,6 +107,8 @@ class MainLayer(Widget):
                                   font_name="res/font/Far_Fanni",
                                   font_size="24",
                                   color=[1, 0, 1, 1])
+        self.available_answer_box = 3
+        self.available_answer_box_runs = True
         self.selected_word = self.main_word
         self._move_word = None
         self._move_word_direction_x = 5
@@ -99,13 +118,8 @@ class MainLayer(Widget):
         Window.clearcolor = (.9, 1, 1, 1)
 
     #################
-    # score
+    # Animation
     #################
-
-    def update_score(self, *args):
-        if self.score < self.current_score:
-            self.score += 5
-            self.score_text.text = fix_text(str(self.score))
 
     def show_score_1(self):
         self.calculate_score()
@@ -113,6 +127,47 @@ class MainLayer(Widget):
         anim = Animation(opacity=1, duration=.4)
         anim += Animation(opacity=0, duration=.2)
         anim.start(self.pop_up_1)
+
+    def fade_results(self, w):
+        print(w)
+        if w:
+            print(self.available_answer_result())
+            _pos = w.pos
+            anim = Animation(opacity=1, duration=1)
+            anim += Animation(pos=(_pos[0] + 50, _pos[1]), duration=.1)
+            anim += Animation(pos=(_pos[0] - 50, _pos[1]), duration=.1)
+            anim += Animation(pos=(_pos[0], _pos[1]), opacity=0, duration=.1)
+            anim.bind(on_complete=self.answer_result_not_busy)
+            anim.start(w)
+
+    def answer_result_not_busy(self, *args):
+        self.available_answer_box += 1
+
+    def available_answer_result(self):
+        if 0 < self.available_answer_box:
+            name = "answer_result_line_" + str(4 - self.available_answer_box)
+            if 3 < self.available_answer_box:
+                name = None
+        else:
+            self.available_answer_box_runs = False
+            name = None
+        return name
+
+    def move_selected(self, w, i: Label):
+        _selected_pos = (i.pos[0] - 20, i.pos[1] - 20)
+        _selected_size = (i.size[0] + 40, i.size[1] + 40)
+        anim = Animation(pos=_selected_pos, size=_selected_size, duration=.05)
+        anim.bind(on_complete=self.analyse_results)
+        anim.start(w)
+
+    #################
+    # score
+    #################
+
+    def update_score(self, *args):
+        if self.score < self.current_score:
+            self.score += 5
+            self.score_text.text = fix_text(str(self.score))
 
     def calculate_score(self):
         score = None
@@ -145,10 +200,6 @@ class MainLayer(Widget):
     def move_word(self, *args):
         self._through_label(self.main_word, 1, direction_factor(self.main_word)[1] * 50)
         self._through_label(self.main_word, 0, direction_factor(self.main_word)[0] * 40)
-
-    def animate(self):
-        self._move_word = Clock.schedule_interval(
-            self.move_word, 0)
 
     def touched_words(self, touch):
         list_of_targets = [self.main_word, self.syn_word]
@@ -185,24 +236,18 @@ class MainLayer(Widget):
     #################
 
     def analyse_results(self, *args):
-        print("okk")
         if self.selected_2_is_selected:
-            self.answer_result.text = self.main_word.text + " = " + self.syn_word.text
-            self.answer_result.color = [0, .4, .2, 1]
-            self.fade_results()
-
-    def fade_results(self):
-        w = self.answer_result
-        w.opacity = 1
-        _pos = self.answer_result.pos
-        anim = Animation (duration=1)
-        anim += Animation(pos=(_pos[0] + 50, _pos[1]), duration=.1)
-        anim += Animation(pos=(_pos[0] - 50, _pos[1]), duration=.1)
-        anim += Animation(pos=(_pos[0], _pos[1]), opacity=0, duration=.5)
-        # anim.bind(on_complete=self.analyse_results)
-        anim.start(w)
-
-
+            if self.available_answer_result():
+                w = self.__dict__[self.available_answer_result()]
+                if self.available_answer_box == 3:
+                    self.available_answer_box_runs = True
+                self.available_answer_box -= 1
+                w.text = self.main_word.text + " = " + self.syn_word.text
+                w.color = [0, .4, .2, 1]
+                if self.available_answer_box_runs:
+                    self.fade_results(w)
+            else:
+                self.available_answer_box = 3
 
     #################
     # Events
@@ -222,13 +267,6 @@ class MainLayer(Widget):
 
             self.right_answer = True
             self.show_score_1()
-
-    def move_selected(self, w, i: Label):
-        _selected_pos = (i.pos[0] - 20, i.pos[1] - 20)
-        _selected_size = (i.size[0] + 40, i.size[1] + 40)
-        anim = Animation(pos=_selected_pos, size=_selected_size, duration=.05)
-        anim.bind(on_complete=self.analyse_results)
-        anim.start(w)
 
 
 class WordsApp(App):
