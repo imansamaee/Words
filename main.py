@@ -20,15 +20,15 @@ from kivy.metrics import dp
 from kivy.uix.floatlayout import FloatLayout
 
 from kivy.uix.gridlayout import GridLayout
-from kivy.uix.image import AsyncImage
 
 from kivy.uix.widget import Widget
 from core.front import PopUpWindow
 from core.helper import *
 
+touch_circle_size = 40
+
 
 class MainLayer(Widget):
-
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -44,8 +44,6 @@ class MainLayer(Widget):
         self.sound_background.play()
 
         Clock.schedule_interval(self.update_score, 0)
-
-        self.bg = AsyncImage(source='res/images/background/loading.gif', anim_delay=0.01, pos=(400, 400))
 
         with self.canvas:
             Color(0.2, .9, .9, .1, mode="rgba")
@@ -96,23 +94,25 @@ class MainLayer(Widget):
                                               Window.width, Window.height),
                                    )
 
-            self.labels = [Label(pos=(i, i),
-                                 text=fix_text("ایمان سمائی"),
-                                 font_name="res/font/Far_Fanni",
-                                 font_size="18",
-                                 color=[0, 0.3, 0, 1]) for i in range(100, 500, 50)]
+            self.main_word = Label(pos=(150, 450),
+                                   text=fix_text("سارا بیات"),
+                                   font_name="res/font/Far_Fanni",
+                                   font_size=dp("24"),
+                                   color=[1, 0, 1, 1])
 
+            self.syn_word = Label(pos=(50, 150),
+                                  text=fix_text("ایمان سمائی"),
+                                  font_name="res/font/Far_Fanni",
+                                  font_size="24",
+                                  color=[1, 0, 1, 1])
         self.available_answer_box = 3
         self.available_answer_box_runs = True
-        self.selected_word = None
+        self.selected_word = self.main_word
         self._move_word = None
         self._move_word_direction_x = 5
         self._move_word_direction_y = 3
-        self.selected_word_1 = self.labels[0]
-        self.selected_word_2 = self.labels[1]
-        for i in self.labels:
-            i.size = self.label_size(i)
-
+        self.main_word.size = self.label_size(self.main_word)
+        self.syn_word.size = self.label_size(self.syn_word)
         Window.clearcolor = (.9, 1, 1, 1)
         self.selected_1_is_selected = False
         self.selected_2_is_selected = False
@@ -122,46 +122,29 @@ class MainLayer(Widget):
     #################
     # Animation
     #################
-    def appear_word_randomly(self, target_object: Label):
-        colliding = True
-        target_object.opacity = 1
-        for i in range(1, 200):
-            colliding = False
-            target_object.pos = (round(Window.width * random() * .8), round(Window.height * random() * .8))
-            for label in self.labels:
-                if rec_colliding(label, target_object):
-                    colliding = True
-                    break
-            if not colliding:
-                break
-        anim = Animation(pos=(target_object.pos[0] + 10, target_object.pos[1]), duration=.02)
-        anim += Animation(pos=(target_object.pos[0] - 7, target_object.pos[1]), duration=.02)
-        anim += Animation(pos=target_object.pos, duration=.02)
-        anim.start(target_object)
 
     def couple_answers(self):
-        self._couple_answer_1("selected_1")
-        self._couple_answer_1("selected_2")
-        self._couple_answer_1("selected_word_1")
-        self._couple_answer_1("selected_word_2")
+        self._couple_answer_1()
+        self._couple_answer_2()
         self._couple_lines()
 
-    def _couple_answer_1(self, _object):
+    def _couple_answer_1(self):
         self.pop_up_1.text = fix_text(str(self.added_score))
-        target_object = self.__dict__[_object]
-        new_pos = self.__dict__["selected_" + _object[-1] + "_new_pos"]
-        if self.__dict__[_object].__class__ == list:
-            l_size = self.label_size(target_object)
-            new_pos = (new_pos[0], new_pos[1] + l_size[1])
         anim = Animation(pos=(Window.width / 2, Window.height / 2), duration=.2)
-        anim += Animation(pos=new_pos, duration=.2)
+        anim += Animation(pos=self.selected_1_new_pos, duration=.2)
         anim += Animation(duration=.5)
         anim += Animation(pos=(-500, 0), duration=0)
-        anim.start(target_object)
+        anim.start(self.selected_1)
+
+    def _couple_answer_2(self):
+        anim = Animation(pos=(Window.width / 2, Window.height / 2), duration=.2)
+        anim += Animation(pos=self.selected_2_new_pos, duration=.2)
+        anim += Animation(duration=.5)
+        anim += Animation(pos=(-500, 0), duration=0)
+        anim.start(self.selected_2)
 
     def _couple_lines(self):
-        new_points = [self.selected_1_new_pos[0] + (self.selected_2.size[0] + self.selected_2.size[0]) / 2,
-                      self.selected_1_new_pos[1] + 20,
+        new_points = [self.selected_1_new_pos[0] + (self.selected_2.size[0]+self.selected_2.size[0])/2, self.selected_1_new_pos[1] + 20,
                       self.selected_2_new_pos[0],
                       self.selected_2_new_pos[1] + 20]
         anim = Animation(points=new_points, duration=.2)
@@ -174,7 +157,6 @@ class MainLayer(Widget):
         self.pop_up_1.text = fix_text(str(self.added_score))
         anim = Animation(opacity=1, duration=.4)
         anim += Animation(opacity=0, duration=.2)
-        anim.bind(on_complete=self.recover_words_position)
         anim.start(self.pop_up_1)
 
     def fade_results(self, w):
@@ -245,39 +227,40 @@ class MainLayer(Widget):
     #
     # def _move_selected_2(self, *args):
     #     move_selected(self.selected_2, self.selected_word)
-    def recover_words_position(self, *args):
-        for i in self.labels:
-            if i.pos[0] == -500:
-                print(i.pos)
-                self.appear_word_randomly(i)
 
     def move_word(self, *args):
-        self._through_label(self.selected_word_1, 1, direction_factor(self.selected_word_1)[1] * 50)
-        self._through_label(self.selected_word_1, 0, direction_factor(self.selected_word_1)[0] * 40)
+        self._through_label(self.main_word, 1, direction_factor(self.main_word)[1] * 50)
+        self._through_label(self.main_word, 0, direction_factor(self.main_word)[0] * 40)
 
     def touched_words(self, touch):
-        list_of_targets = self.labels
-        label_index_list = []
+        list_of_targets = [self.main_word, self.syn_word]
+        list_of_touched_elements = []
 
-        for key, value in enumerate(list_of_targets):
-            value.size = self.label_size(value)
+        for i in list_of_targets:
+            i.size = self.label_size(i)
             rec_1 = self.temp_label_rec
             if rec_is_touched(rec_1, touch.pos):
-                self.selected_word = value
-                label_index_list.append(key)
-                if self.selected_1_is_selected:
-                    self.selected_word_1 = value
-                else:
-                    self.selected_word_2 = value
-        return label_index_list
+                self.selected_word = i
+                list_of_touched_elements.append(i)
+        return list_of_touched_elements
 
     def label_size(self, label: Label):
         size = (len(label.text) *
-                int(label.font_size) * .7,
-                int(label.font_size) * 1.2)
+                int(label.font_size) * .6,
+                int(label.font_size) * .8)
         self.temp_label_rec.size = size
         self.temp_label_rec.pos = label.pos
         return size
+
+    def through_syn_word_up(self, *args):
+        self._through_label(self.syn_word, 1, direction_factor(self.syn_word)[1] * 50)
+        self._through_label(self.syn_word, 0, direction_factor(self.syn_word)[0] * 40)
+
+    def _through_label(self, label: Label, direction, velocity, *args):
+        _size = self.label_size(label)
+        _pos = label.pos
+        if _pos[direction] + _size[direction] / 2 < Window.width:
+            label.pos[direction] += velocity
 
     #################
     # Results
@@ -291,7 +274,7 @@ class MainLayer(Widget):
                 if self.available_answer_box == 3:
                     self.available_answer_box_runs = True
                 self.available_answer_box -= 1
-                w.text = self.selected_word_1.text + " = " + self.selected_word_2.text
+                w.text = self.main_word.text + " = " + self.syn_word.text
                 w.color = [0, .4, .2, 1]
                 if self.available_answer_box_runs:
                     self.fade_results(w)
@@ -306,15 +289,14 @@ class MainLayer(Widget):
     def on_touch_up(self, touch):
 
         for i in self.touched_words(touch):
-            selected_label = self.labels[i]
             if not self.selected_1_is_selected:
-                self.selected_1_new_pos = Window.width - 200, Window.height - 200
-                self.selected_2_new_pos = 200 , Window.height - 200
-                self.move_selected(self.selected_1, selected_label)
+                self.selected_1_new_pos = 100, 300
+                self.selected_2_new_pos = 500, 300
+                self.move_selected(self.selected_1, i)
                 self.selected_1_is_selected = True
                 self.selected_2_is_selected = False
             else:
-                self.move_selected(self.selected_2, selected_label)
+                self.move_selected(self.selected_2, i)
                 self.selected_2_is_selected = True
                 self.selected_1_is_selected = False
 
