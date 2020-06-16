@@ -46,16 +46,16 @@ class MainLayer(Widget):
         Clock.schedule_interval(self.update_score, 0)
 
         with self.canvas:
-            Color(0.2, .9, .9, .1, mode="rgba")
+            Color(0.2, .9, .9, .4, mode="rgba")
             self.selected_1 = RoundedRectangle(size=(0, 0))
-            Color(0, 1, 0, .1, mode="rgba")
+            Color(0, 1, 0, .4, mode="rgba")
             self.selected_2 = RoundedRectangle(size=(0, 0))
             Color(0, 0, 0, 0, mode="rgba")
             self.temp_label_rec = Rectangle()
             self.score_text = Label(pos=(Window.width - 230, Window.height - 100),
                                     text=fix_text(str(self.score)),
                                     font_name="res/font/Far_Fanni",
-                                    font_size="12",
+                                    font_size=dp("12"),
                                     halign='left',
                                     color=[0, 0, 1, 1])
             Color(0, .1, 2, .1, mode="rgba")
@@ -63,7 +63,7 @@ class MainLayer(Widget):
             self.score_label = Label(pos=(Window.width - 150, Window.height - 100),
                                      text=fix_text("امتیاز : "),
                                      font_name="res/font/Far_Fanni",
-                                     font_size="12",
+                                     font_size=dp("12"),
                                      halign='left',
                                      color=[0, 0, 1, 1])
 
@@ -77,14 +77,14 @@ class MainLayer(Widget):
 
             self.answer_result_line_2 = Label(pos=(50, Window.height - 130),
                                               font_name="res/font/Far_Fanni",
-                                              font_size="12",
+                                              font_size=dp("12"),
                                               halign='left',
                                               opacity=1,
                                               color=[0, 0, 1, 1])
 
             self.answer_result_line_3 = Label(pos=(50, Window.height - 160),
                                               font_name="res/font/Far_Fanni",
-                                              font_size="12",
+                                              font_size=dp("12"),
                                               halign='left',
                                               opacity=1,
                                               color=[0, 0, 1, 1])
@@ -103,7 +103,7 @@ class MainLayer(Widget):
             self.syn_word = Label(pos=(50, 150),
                                   text=fix_text("ایمان سمائی"),
                                   font_name="res/font/Far_Fanni",
-                                  font_size="24",
+                                  font_size=dp("24"),
                                   color=[1, 0, 1, 1])
         self.available_answer_box = 3
         self.available_answer_box_runs = True
