@@ -22,8 +22,12 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.image import AsyncImage
 
 from kivy.uix.widget import Widget
-from core.front import PopUpWindow
-from core.helper import *
+from game.front import PopUpWindow
+from game.helper import *
+
+from core.brain import Person
+words_source = Person(1)
+player = Person(100)
 
 
 class MainLayer(Widget):
@@ -36,16 +40,18 @@ class MainLayer(Widget):
         self.added_score = 0
         self.current_score = 0
         self.right_answer = False
+
+
         self.pop_up_1 = PopUpWindow()
         # sound:
-        self.sound_background = SoundLoader.load("res/sound/word/start_action.wav")
-        self.sound_hit = SoundLoader.load("res/sound/effects/beep.ogg")
-        self.sound_pop_1 = SoundLoader.load("res/sound/effects/pop_1.wav")
+        self.sound_background = SoundLoader.load("src/game/sound/word/start_action.wav")
+        self.sound_hit = SoundLoader.load("src/game/sound/effects/beep.ogg")
+        self.sound_pop_1 = SoundLoader.load("src/game/sound/effects/pop_1.wav")
         self.sound_background.play()
 
         Clock.schedule_interval(self.update_score, 0)
 
-        self.bg = AsyncImage(source='res/images/background/loading.gif', anim_delay=0.01, pos=(400, 400))
+        self.bg = AsyncImage(source='game/images/background/loading.gif', anim_delay=0.01, pos=(400, 400))
 
         with self.canvas:
             Color(0.1, 0.4, 0.2, .7, mode="rgb")
@@ -56,7 +62,7 @@ class MainLayer(Widget):
             self.temp_label_rec = Rectangle()
             self.score_text = Label(pos=(Window.width - 230, Window.height - 100),
                                     text=fix_text(str(self.score)),
-                                    font_name="res/font/Far_Fanni",
+                                    font_name="src/game/font/Far_Fanni",
                                     font_size=dp("8"),
                                     halign='left',
                                     color=[0, 0, 1, 1])
@@ -64,28 +70,28 @@ class MainLayer(Widget):
             self.answer_connection_line = Line(width=2)
             self.score_label = Label(pos=(Window.width - 150, Window.height - 100),
                                      text=fix_text("امتیاز : "),
-                                     font_name="res/font/Far_Fanni",
+                                     font_name="src/game/font/Far_Fanni",
                                      font_size=dp("8"),
                                      halign='left',
                                      color=[0, 0, 1, 1])
 
             self.answer_result_line_1 = Label(pos=(50, Window.height - 100),
                                               text=fix_text(""),
-                                              font_name="res/font/Far_Fanni",
+                                              font_name="src/game/font/Far_Fanni",
                                               font_size=dp("12"),
                                               halign='left',
                                               opacity=0,
                                               color=[0, 0, 1, 1])
 
             self.answer_result_line_2 = Label(pos=(50, Window.height - 130),
-                                              font_name="res/font/Far_Fanni",
+                                              font_name="src/game/font/Far_Fanni",
                                               font_size=dp("12"),
                                               halign='left',
                                               opacity=1,
                                               color=[0, 0, 1, 1])
 
             self.answer_result_line_3 = Label(pos=(50, Window.height - 160),
-                                              font_name="res/font/Far_Fanni",
+                                              font_name="src/game/font/Far_Fanni",
                                               font_size=dp("12"),
                                               halign='left',
                                               opacity=1,
@@ -97,8 +103,7 @@ class MainLayer(Widget):
                                    )
 
             self.labels = [Label(pos=(-500, 0),
-                                 text=fix_text("ایمان سمائی"),
-                                 font_name="res/font/Far_Fanni",
+                                 font_name="src/game/font/Far_Fanni",
                                  font_size=dp("18"),
                                  color=[0, 0.3, 0, 1]) for i in range(100, 500, 50)]
 
@@ -128,6 +133,7 @@ class MainLayer(Widget):
     # Animation
     #################
     def appear_word_randomly(self, target_object: Label, _duration):
+        target_object.text = fix_text(words_source.random_word())
         self.sound_pop_1.play()
         _height = 100
         x = [i for i in range(200, Window.height - 300, 100)]
