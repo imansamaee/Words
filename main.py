@@ -7,8 +7,7 @@ This demonstrates how to use the extended line drawing routines such
 as circles, ellipses, and rectangles. You should see a static image of
 labelled shapes on the screen.
 '''
-from random import Random, random
-
+import random
 from kivy.animation import Animation
 from kivy.app import App
 from kivy.clock import Clock
@@ -41,6 +40,7 @@ class MainLayer(Widget):
         # sound:
         self.sound_background = SoundLoader.load("res/sound/word/start_action.wav")
         self.sound_hit = SoundLoader.load("res/sound/effects/beep.ogg")
+        self.sound_pop_1 = SoundLoader.load("res/sound/effects/pop_1.wav")
         self.sound_background.play()
 
         Clock.schedule_interval(self.update_score, 0)
@@ -48,24 +48,24 @@ class MainLayer(Widget):
         self.bg = AsyncImage(source='res/images/background/loading.gif', anim_delay=0.01, pos=(400, 400))
 
         with self.canvas:
-            Color(0.2, .9, .9, .1, mode="rgba")
+            Color(0.1, 0.4, 0.2, .7, mode="rgb")
             self.selected_1 = RoundedRectangle(size=(0, 0))
-            Color(0, 1, 0, .1, mode="rgba")
+            Color(0.2, 0.1, 0.4, .7, mode="rgb")
             self.selected_2 = RoundedRectangle(size=(0, 0))
             Color(0, 0, 0, 0, mode="rgba")
             self.temp_label_rec = Rectangle()
             self.score_text = Label(pos=(Window.width - 230, Window.height - 100),
                                     text=fix_text(str(self.score)),
                                     font_name="res/font/Far_Fanni",
-                                    font_size="12",
+                                    font_size=dp("8"),
                                     halign='left',
                                     color=[0, 0, 1, 1])
-            Color(0, .1, 2, .1, mode="rgba")
-            self.answer_connection_line = Line(points=[0, 0, 0, 0], width=1)
+            Color(0.2, 0.5, 0.2, 1, mode="rgba")
+            self.answer_connection_line = Line(width=2)
             self.score_label = Label(pos=(Window.width - 150, Window.height - 100),
                                      text=fix_text("امتیاز : "),
                                      font_name="res/font/Far_Fanni",
-                                     font_size="12",
+                                     font_size=dp("8"),
                                      halign='left',
                                      color=[0, 0, 1, 1])
 
@@ -79,27 +79,27 @@ class MainLayer(Widget):
 
             self.answer_result_line_2 = Label(pos=(50, Window.height - 130),
                                               font_name="res/font/Far_Fanni",
-                                              font_size="12",
+                                              font_size=dp("12"),
                                               halign='left',
                                               opacity=1,
                                               color=[0, 0, 1, 1])
 
             self.answer_result_line_3 = Label(pos=(50, Window.height - 160),
                                               font_name="res/font/Far_Fanni",
-                                              font_size="12",
+                                              font_size=dp("12"),
                                               halign='left',
                                               opacity=1,
                                               color=[0, 0, 1, 1])
 
-            Color(160, 92, 56, 1, mode="rgba")
+            Color(0.2, 0.1, 0.4, 1, mode="rgba")
             self.score_line = Line(rectangle=(0, Window.height - 100,
                                               Window.width, Window.height),
                                    )
 
-            self.labels = [Label(pos=(i, i),
+            self.labels = [Label(pos=(-500, 0),
                                  text=fix_text("ایمان سمائی"),
                                  font_name="res/font/Far_Fanni",
-                                 font_size="18",
+                                 font_size=dp("18"),
                                  color=[0, 0.3, 0, 1]) for i in range(100, 500, 50)]
 
         self.available_answer_box = 3
@@ -118,35 +118,44 @@ class MainLayer(Widget):
         self.selected_2_is_selected = False
         self.selected_1_new_pos = None
         self.selected_2_new_pos = None
+        self.init_labels()
+
+    def init_labels(self):
+        for i in self.labels:
+            self.appear_word_randomly(i, 0)
 
     #################
     # Animation
     #################
-    def appear_word_randomly(self, target_object: Label):
-        colliding = True
-        target_object.opacity = 1
-        for i in range(1, 200):
-            colliding = False
-            target_object.pos = (round(Window.width * random() * .8), round(Window.height * random() * .8))
-            for label in self.labels:
-                if rec_colliding(label, target_object):
-                    colliding = True
-                    break
-            if not colliding:
+    def appear_word_randomly(self, target_object: Label, _duration):
+        self.sound_pop_1.play()
+        _height = 100
+        x = [i for i in range(200, Window.height - 300, 100)]
+        _list = random.sample(x, len(x))
+        current_list = [i.pos[1] for i in self.labels]
+        for i in _list:
+            if i not in current_list:
+                _height = i
                 break
-        anim = Animation(pos=(target_object.pos[0] + 10, target_object.pos[1]), duration=.02)
-        anim += Animation(pos=(target_object.pos[0] - 7, target_object.pos[1]), duration=.02)
+        target_object.pos = (round(Window.width * random.random() * .6), _height)
+        anim = Animation(pos=(target_object.pos[0] + 20, target_object.pos[1]), duration=0.1)
+        anim += Animation(pos=(target_object.pos[0] - 15, target_object.pos[1]), duration=0.1)
+        anim += Animation(pos=(target_object.pos[0] + 10, target_object.pos[1]), duration=0.1)
+        anim += Animation(pos=(target_object.pos[0] - 5, target_object.pos[1]), duration=0.2)
+        anim += Animation(duration=_duration)
         anim += Animation(pos=target_object.pos, duration=.02)
+        anim.bind(on_complete=self.recover_words_position)
         anim.start(target_object)
 
     def couple_answers(self):
-        self._couple_answer_1("selected_1")
-        self._couple_answer_1("selected_2")
-        self._couple_answer_1("selected_word_1")
-        self._couple_answer_1("selected_word_2")
+        # self.move_word_up("selected_1")
+        # self.move_word_up("selected_2")
+        self.selected_1.pos = self.selected_2.pos = (-500, 0)
+        self.move_word_up("selected_word_1")
+        self.move_word_up("selected_word_2")
         self._couple_lines()
 
-    def _couple_answer_1(self, _object):
+    def move_word_up(self, _object):
         self.pop_up_1.text = fix_text(str(self.added_score))
         target_object = self.__dict__[_object]
         new_pos = self.__dict__["selected_" + _object[-1] + "_new_pos"]
@@ -160,13 +169,17 @@ class MainLayer(Widget):
         anim.start(target_object)
 
     def _couple_lines(self):
-        new_points = [self.selected_1_new_pos[0] + (self.selected_2.size[0] + self.selected_2.size[0]) / 2,
-                      self.selected_1_new_pos[1] + 20,
-                      self.selected_2_new_pos[0],
-                      self.selected_2_new_pos[1] + 20]
-        anim = Animation(points=new_points, duration=.2)
-        anim += Animation(duration=.5)
-        anim += Animation(points=[0, 0, 0, 0], duration=0)
+        _points_1 = [50,
+                     Window.height - 200,
+                     Window.width - 50,
+                     Window.height - 200]
+        _points_2 = [Window.width / 2,
+                     Window.height - 200,
+                     Window.width / 2,
+                     Window.height - 200]
+        anim = Animation(points=_points_2, duration=.2)
+        anim += Animation(points=_points_1, duration=.2)
+        anim += Animation(points=_points_2, duration=.2)
         anim.start(self.answer_connection_line)
 
     def show_score_1(self):
@@ -174,13 +187,11 @@ class MainLayer(Widget):
         self.pop_up_1.text = fix_text(str(self.added_score))
         anim = Animation(opacity=1, duration=.4)
         anim += Animation(opacity=0, duration=.2)
-        anim.bind(on_complete=self.recover_words_position)
         anim.start(self.pop_up_1)
 
     def fade_results(self, w):
-        print(w)
+        self.recover_words_position()
         if w:
-            print(self.available_answer_result())
             _pos = w.pos
             anim = Animation(opacity=1, duration=1)
             anim += Animation(pos=(_pos[0] + 50, _pos[1]), duration=.1)
@@ -221,7 +232,7 @@ class MainLayer(Widget):
     def calculate_score(self):
         score = None
         if self.right_answer:
-            score = round(1000 * random())
+            score = round(1000 * random.random())
             self.current_score = self.score + score
             self.added_score = score
         self.right_answer = False
@@ -246,10 +257,11 @@ class MainLayer(Widget):
     # def _move_selected_2(self, *args):
     #     move_selected(self.selected_2, self.selected_word)
     def recover_words_position(self, *args):
+        self.sound_pop_1.stop()
         for i in self.labels:
             if i.pos[0] == -500:
-                print(i.pos)
-                self.appear_word_randomly(i)
+                self.appear_word_randomly(i, 0.8)
+                break
 
     def move_word(self, *args):
         self._through_label(self.selected_word_1, 1, direction_factor(self.selected_word_1)[1] * 50)
@@ -285,7 +297,10 @@ class MainLayer(Widget):
 
     def analyse_results(self, *args):
         if self.selected_2_is_selected:
-            self.answer_connection_line.points = [self.selected_1.pos, self.selected_2.pos]
+            self.answer_connection_line.points = [Window.width / 2,
+                                                  Window.height + 50,
+                                                  Window.width / 2,
+                                                  Window.height + 50]
             if self.available_answer_result():
                 w = self.__dict__[self.available_answer_result()]
                 if self.available_answer_box == 3:
@@ -304,12 +319,11 @@ class MainLayer(Widget):
     #################
 
     def on_touch_up(self, touch):
-
         for i in self.touched_words(touch):
             selected_label = self.labels[i]
             if not self.selected_1_is_selected:
-                self.selected_1_new_pos = Window.width - 200, Window.height - 200
-                self.selected_2_new_pos = 200 , Window.height - 200
+                self.selected_1_new_pos = Window.width - 10 - self.selected_1.size[0], Window.height - 200
+                self.selected_2_new_pos = 60, Window.height - 200
                 self.move_selected(self.selected_1, selected_label)
                 self.selected_1_is_selected = True
                 self.selected_2_is_selected = False

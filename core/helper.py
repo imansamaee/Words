@@ -3,8 +3,6 @@
 Useful functions stored here.
 
 """
-from random import random
-
 from arabic_reshaper import arabic_reshaper
 import bidi.algorithm
 from kivy.animation import Animation
@@ -19,7 +17,6 @@ def rec_colliding(rec_1, rec_2):
             and rec_1.pos[1] + rec_1.size[1] / 2 > rec_2.pos[1] - rec_1.size[1] / 2 \
             and rec_2.pos[1] + rec_2.size[1] / 2 > rec_1.pos[1] - rec_2.size[1] / 2:
         colling = True
-        print(rec_1.pos, rec_2.pos)
 
     else:
         colling = False
