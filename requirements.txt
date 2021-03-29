@@ -5,7 +5,7 @@ docutils==0.16
 future==0.18.2
 idna==2.9
 Kivy==1.11.1
-Pygments==2.6.1
+Pygments==2.7.4
 python-bidi==0.4.2
 requests==2.23.0
 six==1.15.0
